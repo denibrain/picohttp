@@ -1,1 +1,0 @@
-/usr/bin/c++       CMakeFiles/final.dir/main.cpp.o CMakeFiles/final.dir/src/server.cpp.o CMakeFiles/final.dir/src/daemon.cpp.o CMakeFiles/final.dir/src/request.cpp.o CMakeFiles/final.dir/src/filetype.cpp.o  -o final -rdynamic -lpthread -lev -lmagic 
