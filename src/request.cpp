@@ -172,6 +172,14 @@ void HttpRequest::process()
 		}
 	}
 
+	if (pos = strchr(uri, '?')) {
+		*pos = 0;
+	}
+
+	if (pos = strchr(uri, '#')) {
+		*pos = 0;
+	}
+
 	printf("Got uri %s\n", uri);
 
 	len = strlen(uri);
@@ -296,5 +304,7 @@ void HttpRequest::send_headers(HttpResponse response)  {
 		sprintf(hd, "Content-Type: %s\r\n", response.type);
 		send(socket_, hd, strlen(hd), MSG_NOSIGNAL);
 	}
+
+	send(socket_, "Connection: close\r\n", 39,  MSG_NOSIGNAL);
 	send(socket_, endl, 2, MSG_NOSIGNAL);
 }
