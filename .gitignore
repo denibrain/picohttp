@@ -2,3 +2,4 @@ CMakeFiles/*
 final
 CMakeCache.txt
 magic.mgc
+cmake_install.cmake
