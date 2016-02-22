@@ -10,19 +10,14 @@
 #include <filetype.h> // mime
 
 char* concat(char* buf, int size, char* suff, int suff_len) {
-	printf("Concat!");
 	if (buf) {
-		printf("C-1");	
 		buf = (char*)realloc(buf, size + suff_len + 1);
 	} else {
-		printf("C-0");	
 		buf = (char*)malloc(suff_len + 1);
 		size = 0;
 	}
-	printf("Memcpy %d %d\n", size, suff_len);
 	memcpy(buf + size, suff, suff_len);
 	buf[size + suff_len] = 0;
-	printf("MemcpyF\n");
 	return buf;
 }
 
@@ -64,22 +59,17 @@ int HttpRequest::parse_headers()
 	headers_count = 0;
 	char buffer[1024];
 
-	printf("Ready to read headers\n");
-
 	while((r = recv(socket_, buffer, 1024, MSG_NOSIGNAL)) > 0) {
 		total_size += r;
 		if (total_size > 10240) 
 		{
 			return 414;
 		}
-		printf("Read: %ld [%s]\n", total_size, buffer);
-
 		char *pos;
 		char *lastpos = buffer;
 		size_t seach_size = r;
 		while (seach_size > 0 && (pos = (char*)memchr((void*)lastpos, 10, r))) {
 			size_t len = pos - lastpos;
-			printf("Found, len: %ld\n", len);
 			if (!len || (len == 1 && *(pos - 1) == 13)) {
 				if (!headers[headers_count]) {
 					buffer_tail_len = seach_size - len - 1;
@@ -162,8 +152,6 @@ void HttpRequest::process()
 		return;
 	}
 
-	printf("Search uri\n");
-
 	char* uri = pos + 1; 
 	pos = strchr(uri, 32);
 	len = pos - uri;
@@ -175,7 +163,7 @@ void HttpRequest::process()
 	else
 	{
 		http_version = 10;
-		
+
 		*pos = 0; // cut version
 		pos++;
 		if (strcmp(pos, "HTTP/1.0")) {
@@ -272,10 +260,10 @@ void HttpRequest::send_file(char *file_name)
     }
 
 	if (http_version == 10) {
+		send_status(200);
 		HttpResponse response;
 		response.length = file_size;
 		response.type = get_content_type(file_name);
-
 		send_headers(response);
 	}
 
@@ -293,8 +281,7 @@ void HttpRequest::send_file_data(int fd) {
 }
 
 const char* HttpRequest::get_content_type(char* path) {
-	//char exts[][] = {"png", "jpg", "gif", "svg", "html", "pdf", }
-	return FileType::get_instance().get_file_type(path);
+	return FileType::get_instance()->get_file_type(path);
 }
 
 void HttpRequest::send_headers(HttpResponse response)  {
@@ -311,51 +298,3 @@ void HttpRequest::send_headers(HttpResponse response)  {
 	}
 	send(socket_, endl, 2, MSG_NOSIGNAL);
 }
-// setlogmask (LOG_UPTO (LOG_NOTICE));
-// openlog ("exampleprog", LOG_CONS | LOG_PID | LOG_NDELAY, LOG_LOCAL1);
-// syslog (LOG_NOTICE, "Program started by User %d", getuid ());
-// syslog (LOG_INFO, "A tree falls in a forest");
-// closelog ();
-
-// GET /p/writing-an-echo-server-in-libev-and-c/375?23490239409230423904 HTTP/1.1
-// Host: www.skitoy.com
-// Connection: keep-alive
-// Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
-// Upgrade-Insecure-Requests: 1
-// User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36
-// Accept-Encoding: gzip, deflate, sdch
-// Accept-Language: en-US,en;q=0.8,fr;q=0.6,ru;q=0.4
-// Cookie: _ga=GA1.2.1838284241.1455992530
-
-// GET /home/about/11.html HTTP/1.1
-// Host: www.cnzexpress.com
-// Connection: keep-alive
-// Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8
-// Upgrade-Insecure-Requests: 1
-// User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/48.0.2564.109 Safari/537.36
-// Referer: http://www.cnzexpress.com/track.php
-// Accept-Encoding: gzip, deflate, sdch
-// Accept-Language: en-US,en;q=0.8,fr;q=0.6,ru;q=0.4
-// Cookie: a2192_pages=4; a2192_times=7
-
-// HTTP/1.1 200 OK
-// Date: Sun, 21 Feb 2016 17:25:44 GMT
-// Last-Modified: Wed, 13 Sep 2000 14:31:48 GMT
-// ETag: "238e6-3712b40649d00"
-// Accept-Ranges: bytes
-// Content-Length: 145638
-// Cache-Control: max-age=21600
-// Expires: Sun, 21 Feb 2016 23:25:44 GMT
-// P3P: policyref="http://www.w3.org/2014/08/p3p.xml"
-// Content-Type: text/html; charset=iso-8859-1
-// Strict-Transport-Security: max-age=604800; includeSubdomains; preload
-// Content-Security-Policy: upgrade-insecure-requests
-
-// HTTP/1.1 304 Not Modified
-// Date: Sun, 21 Feb 2016 17:35:47 GMT
-// ETag: "238e6-3712b40649d00"
-// Expires: Sun, 21 Feb 2016 23:35:47 GMT
-// Cache-Control: max-age=21600
-// Strict-Transport-Security: max-age=604800; includeSubdomains; preload
-// Content-Security-Policy: upgrade-insecure-requests
-

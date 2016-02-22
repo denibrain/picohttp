@@ -5,8 +5,9 @@
 
 class FileType {
 public:
-	static FileType get_instance();
+	static FileType* get_instance();
 	const char* get_file_type(char* file_name);
+	void init();
 	~FileType();
 private:
 	FileType();

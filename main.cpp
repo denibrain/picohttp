@@ -5,6 +5,7 @@
 #include <string.h>
 #include <signal.h>
 #include <daemon.h>
+#include <filetype.h>
 
 HttpServer* server;
 
@@ -15,6 +16,7 @@ static void stop_signal_handler(int signal_no) {
 int main(int argc, char ** argv) 
 {
 	char pid_file[] = "/tmp/final.pid";
+	char log_file[] = "/tmp/final.log";
 	unsigned short port = 12345;
 	char ip[64] = "0.0.0.0";
 	char root[1024];
@@ -65,7 +67,9 @@ int main(int argc, char ** argv)
 		}
 	}
 
-	// int daemonize(char* log_file) 
+	daemonize(root, log_file, pid_file);
+
+	FileType::get_instance()->init();
 
   	server = new HttpServer(ip, port, root);
     signal(SIGTERM, stop_signal_handler);
